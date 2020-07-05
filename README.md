@@ -23,6 +23,7 @@ Put the access token and your MAL credentials in an `auth.json` file in the proj
 
 The file should look like so:
 ```
+// auth.json
 {
     "ACCESS_TOKEN": <your_access_token>,
     "MAL_USERNAME": <your_username>,
