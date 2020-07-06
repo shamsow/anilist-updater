@@ -56,8 +56,6 @@ def get_list_data(username="shamsow", userID=543014):
         variables["page"] += 1
         response = requests.post(url, json={'query': query, 'variables': variables}).json()
         data["data"]["Page"]["mediaList"] += response["data"]["Page"]["mediaList"]
-        # data["data"]["Page"]["pageInfo"] = response["data"]["Page"]["pageInfo"]
-        # data["data"]["Page"]["pageInfo"]["currentPage"] += 1
     
     print("Completed Shows in AniList:", len(data["data"]["Page"]["mediaList"]))
 
@@ -79,5 +77,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# print(data)

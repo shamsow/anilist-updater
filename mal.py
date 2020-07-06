@@ -20,6 +20,7 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
     """
     Use Selenium with a Chrome driver to get the MyAnimeList xml file and move it to the project folder
     """
+    # Check if list has already been fetched today
     if os.path.exists('mal.json'):
         with open('mal.json', 'r') as f:
             data = json.load(f)
@@ -39,35 +40,34 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
     # driver = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
     driver = webdriver.Chrome(executable_path=chrome_path)
 
-
+    # Get MAL username and password
     creds = {}
     with open(AUTH_FILE, 'r') as f:
         creds = json.load(f)
-
+    # Login to MAL
     driver.get("https://myanimelist.net/login.php")
     driver.find_element_by_id("loginUserName").send_keys(creds["MAL_USERNAME"])
     driver.find_element_by_id("login-password").send_keys(creds["MAL_PASSWORD"])
     driver.find_element_by_name("sublogin").click()
-
-
+    # Navigate to list export page accept the alert
     driver.get("https://myanimelist.net/panel.php?go=export")
     elem = driver.find_element_by_name("subexport")
     elem.click()
     alert = driver.switch_to.alert
     alert.accept()
-    
+    # Get the current page after being redirected
     new_url = driver.window_handles[0]
     driver.switch_to.window(new_url)
-
+    # Click the list export link and download
     list_link = driver.find_element_by_partial_link_text("animelist_")
     list_link.click()
-
+    # Delay for 5 seocnds to allow the list to donwload
     time.sleep(5)
     print("Selenium tasks complete")
     driver.close()
 
     print("Copying file")
-
+    # Get the downloaded file from the downloads folder and move it to project folder
     filename = glob(download_location + '*.gz')
     if len(filename) != 1:
         print("More than one animelist .gz files in donwloads folder. Delete all except the latest one.")
@@ -77,8 +77,8 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
         
         with open(desired_location + filename[0][29:], 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
-
     os.remove(filename[0])
+
     return True
 
 
@@ -109,11 +109,12 @@ def rename_list(new_name='animelist.xml'):
     if len(xml_file) > 1:
         print(xml_file)
         for name in xml_file:
+            # Remove the old animelist file
             if name == 'animelist.xml':
                 os.remove(name)
         xml_file = glob('*.xml')
         print(xml_file)
-    
+    # Rename the latest animelist file
     os.rename(xml_file[0], new_name)
 
 def extract_data_from_list(filename):
@@ -126,6 +127,8 @@ def extract_data_from_list(filename):
     if not os.path.exists(filename):
         print("Could not find the list file. Make sure the file has been added and properly named.")
         return
+
+    # Get the needed user info fields from the xml file
     tree = ET.parse(filename)
     root = tree.getroot()
     info = root[0]
@@ -135,6 +138,7 @@ def extract_data_from_list(filename):
     date = time.strftime("%Y-%m-%d")
     data = {"username": username, "total_anime": total_anime, "total_completed": total_completed, "date": date, "list_data": []}
 
+    # Get the needed anime info fields form the xml file
     anime = {}
     for child in root[1:]:
         title = child.find('series_title').text
@@ -158,6 +162,7 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
     """
     res = fetch_list()
     if res is not None:
+        # Proceed to creating a file if the old one is invalid or it doesn't exist
         data = extract_data_from_list(filename)
         if data is not None:
             with open(output, 'w') as f:
@@ -166,8 +171,6 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
             return
 
 def main():
-    # print(BASE_DIR)
-    # fetch_list()
     create_mal_file()
     
 

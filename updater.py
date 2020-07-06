@@ -40,14 +40,14 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
     mal = load_data(mal_file)
     print("MyAnimeList file created on", mal["date"])
 
+    # Get the id of all the anime in each list
     anilist_id = [i["media"]["idMal"] for i in  anilist["data"]["Page"]["mediaList"]]
     print("Completed Shows in AniList:", len(anilist_id))
-
     mal_id = list(map(int, mal["list_data"][0].keys()))
     # print(mal_titles)
 
+    # Find the anime that are in MAL but not in AniList
     missing_ids = []
-
     for id in mal_id:
         if id not in anilist_id:
             missing_ids.append((id, mal["list_data"][0][str(id)]["score"]))
@@ -57,8 +57,6 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
     for id, score in missing_ids:
         print(mal["list_data"][0][str(id)])
     
-    # missing_ids = [idMal_to_mediaId[str(i)] for i in missing_ids]
-
     return missing_ids
 
 
