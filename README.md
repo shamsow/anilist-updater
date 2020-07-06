@@ -33,3 +33,4 @@ The file should look like so:
 
 After that, you need to setup your `selenium` driver. Download a chromedriver from [here](https://sites.google.com/a/chromium.org/chromedriver/downloads), place it somewhere convenient and note down the path to the driver.
 Open up `mal.py` and update the `DRIVER_PATH` variale with your path.
+Change the other variables at the top as needed.
