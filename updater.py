@@ -1,6 +1,8 @@
 import json
 import requests
 
+from termcolor import cprint
+
 from mal import create_mal_file
 from anilist import create_anilist_file
 
@@ -54,10 +56,10 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
         if id not in anilist_id:
             missing_ids.append((id, mal["list_data"][0][str(id)]["score"], mal["list_data"][0][str(id)]["status"]))
 
-    print("Missing shows:", len(missing_ids), missing_ids)
+    cprint(f"Missing shows: {len(missing_ids)}", "yellow")
     # print(missing_ids)
     for id, score, status in missing_ids:
-        print(mal["list_data"][0][str(id)], statuses[status])
+        cprint(mal["list_data"][0][str(id)], "cyan")
     
     return missing_ids
 
@@ -91,7 +93,8 @@ def update_anilist(id, score, status):
         'Accept': 'application/json',
     }
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers).json()
-    print("Added:", response["data"]["SaveMediaListEntry"]["id"])
+    entry_id = response["data"]["SaveMediaListEntry"]["id"]
+    cprint(f"Added: {entry_id}", "green")
 
 
 def main():
