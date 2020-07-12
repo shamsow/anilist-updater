@@ -8,6 +8,8 @@ AUTH_FILE = 'auth.json'
 ANILIST_FILE = 'anilist.json'
 MAL_FILE = 'mal.json'
 
+statuses = {"Completed": "COMPLETED", "Watching": "CURRENT", "Plan to Watch": "PLANNING", "On-Hold": "PAUSED", "Dropped": "DROPPED"}
+
 def load_data(filename):
     with open(filename, 'r') as f:
         data = json.load(f)
@@ -50,17 +52,17 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
     missing_ids = []
     for id in mal_id:
         if id not in anilist_id:
-            missing_ids.append((id, mal["list_data"][0][str(id)]["score"]))
+            missing_ids.append((id, mal["list_data"][0][str(id)]["score"], mal["list_data"][0][str(id)]["status"]))
 
     print("Missing shows:", len(missing_ids), missing_ids)
-
-    for id, score in missing_ids:
-        print(mal["list_data"][0][str(id)])
+    # print(missing_ids)
+    for id, score, status in missing_ids:
+        print(mal["list_data"][0][str(id)], statuses[status])
     
     return missing_ids
 
 
-def update_anilist(id, score):
+def update_anilist(id, score, status):
     print(f"Adding ID:{id} with a score of {score}")
     query = """
         mutation ($mediaId: Int, $status: MediaListStatus, $score: Float) {
@@ -73,7 +75,7 @@ def update_anilist(id, score):
     # Define our query variables and values that will be used in the query request
     variables = {
         "mediaId": get_mediaId(id),
-        "status": "COMPLETED",
+        "status": statuses[status],
         "score": score
     }
 
@@ -100,8 +102,8 @@ def main():
         command = input("Do you want to update your anilist? (y/n): ")
         if command == "y":
             print("Updating...")
-            for id, score in missing:
-                update_anilist(id, score)
+            for id, score, status in missing:
+                update_anilist(id, score, status)
     else:
         print("AniList is up to date with MyAnimeList")
         
