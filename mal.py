@@ -6,6 +6,7 @@ import json
 import time
 import shutil
 import gzip
+import requests
 import xml.etree.ElementTree as ET
 from glob import glob
 
@@ -20,6 +21,11 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
     """
     Use Selenium with a Chrome driver to get the MyAnimeList xml file and move it to the project folder
     """
+    # Check if internet connection works
+    req = requests.get("https://google.com")
+    if req.status_code != 200:
+        print("No internet. Can't fetch new list.")
+        return
     # Check if list has already been fetched today
     if os.path.exists('mal.json'):
         with open('mal.json', 'r') as f:
@@ -154,7 +160,6 @@ def extract_data_from_list(filename, completed_only=True):
         else:
             anime[malID] = {'title': title, 'score': score, 'status': status, 'watched_episodes': watched_episodes}
     
-    print("Completed shows in MyAnimeList:", len(anime))
     print(f"MyAnimeList -> Total: {total_anime}, Completed: {total_completed}")
 
     data["list_data"].append(anime)

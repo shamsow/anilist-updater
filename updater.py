@@ -46,7 +46,7 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
 
     # Get the id of all the anime in each list
     anilist_id = [i["media"]["idMal"] for i in  anilist["data"]["Page"]["mediaList"]]
-    print("Completed Shows in AniList:", len(anilist_id))
+    # print("Completed Shows in AniList:", len(anilist_id))
     mal_id = list(map(int, mal["list_data"][0].keys()))
     # print(mal_titles)
 
@@ -59,7 +59,7 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
     cprint(f"Missing shows: {len(missing_ids)}", "yellow")
     # print(missing_ids)
     for id, score, status in missing_ids:
-        cprint(mal["list_data"][0][str(id)], "cyan")
+        cprint(mal["list_data"][0][str(id)], "yellow")
     
     return missing_ids
 
@@ -94,7 +94,7 @@ def update_anilist(id, score, status):
     }
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers).json()
     entry_id = response["data"]["SaveMediaListEntry"]["id"]
-    cprint(f"Added: {entry_id}", "green")
+    cprint(f"Added: {entry_id}", "cyan")
 
 
 def main():

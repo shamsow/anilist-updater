@@ -58,7 +58,7 @@ def get_list_data(username="shamsow", userID=543014, status=""):
         response = requests.post(url, json={'query': query, 'variables': variables}).json()
         data["data"]["Page"]["mediaList"] += response["data"]["Page"]["mediaList"]
     
-    print("Completed Shows in AniList:", len(data["data"]["Page"]["pageInfo"]["total"]))
+    print("AniList -> Completed:", data["data"]["Page"]["pageInfo"]["total"])
 
     return data
 
