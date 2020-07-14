@@ -6,6 +6,7 @@ import json
 import time
 import shutil
 import gzip
+import requests
 import xml.etree.ElementTree as ET
 from glob import glob
 
@@ -20,6 +21,11 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
     """
     Use Selenium with a Chrome driver to get the MyAnimeList xml file and move it to the project folder
     """
+    # Check if internet connection works
+    req = requests.get("https://google.com")
+    if req.status_code != 200:
+        print("No internet. Can't fetch new list.")
+        return
     # Check if list has already been fetched today
     if os.path.exists('mal.json'):
         with open('mal.json', 'r') as f:
@@ -69,7 +75,9 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
     print("Copying file")
     # Get the downloaded file from the downloads folder and move it to project folder
     filename = glob(download_location + '*.gz')
-    if len(filename) != 1:
+    if len(filename) == 0:
+        return
+    elif len(filename) > 1:
         print("More than one animelist .gz files in donwloads folder. Delete all except the latest one.")
         return
     print(desired_location + filename[0][29:])
@@ -117,7 +125,7 @@ def rename_list(new_name='animelist.xml'):
     # Rename the latest animelist file
     os.rename(xml_file[0], new_name)
 
-def extract_data_from_list(filename):
+def extract_data_from_list(filename, completed_only=True):
     """
     Extract the relevant anime data from the animelist xml file
     """
@@ -146,10 +154,13 @@ def extract_data_from_list(filename):
         status = child.find('my_status').text
         malID = child.find('series_animedb_id').text
         watched_episodes = child.find('my_watched_episodes').text
-        if status == "Completed":
+        if completed_only:
+            if status == "Completed":
+                anime[malID] = {'title': title, 'score': score, 'status': status, 'watched_episodes': watched_episodes}
+        else:
             anime[malID] = {'title': title, 'score': score, 'status': status, 'watched_episodes': watched_episodes}
     
-    print("Completed shows in MyAnimeList:", len(anime))
+    print(f"MyAnimeList -> Total: {total_anime}, Completed: {total_completed}")
 
     data["list_data"].append(anime)
     
@@ -161,14 +172,14 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
     Store the relevant anime data from the xml file in a JSON file
     """
     res = fetch_list()
-    if res is not None:
+    # if res is not None:
         # Proceed to creating a file if the old one is invalid or it doesn't exist
-        data = extract_data_from_list(filename)
-        if data is not None:
-            with open(output, 'w') as f:
-                json.dump(data, f)
-            print("Created a new MyAnimeList file at:", output)
-            return
+    data = extract_data_from_list(filename)
+    if data is not None:
+        with open(output, 'w') as f:
+            json.dump(data, f)
+        print("Created a new MyAnimeList file at:", output)
+        return
 
 def main():
     create_mal_file()

@@ -2,13 +2,13 @@ import requests
 import json
 # Here we define our query as a multi-line string
 
-def get_list_data(username="shamsow", userID=543014):
+def get_list_data(username="shamsow", userID=543014, status=""):
     """
     Query the AniList API for the users anime list
     """
 
     query = '''
-    query ($page: Int, $perPage: Int, $user: String, $userID: Int) {
+    query ($page: Int, $perPage: Int, $user: String, $userID: Int, $status: MediaListStatus) {
         Page (page: $page, perPage: $perPage) {
             pageInfo {
                 total
@@ -17,7 +17,7 @@ def get_list_data(username="shamsow", userID=543014):
                 hasNextPage
                 perPage
             }
-            mediaList (userId: $userID, userName: $user, status: COMPLETED) {
+            mediaList (userId: $userID, userName: $user, status: $status) {
                 score
                 mediaId
                 status
@@ -42,7 +42,8 @@ def get_list_data(username="shamsow", userID=543014):
         "page": 1,
         "perPage": 50
     }
-
+    if status:
+        variables["status"] = status
     url = 'https://graphql.anilist.co'
 
     # Make the HTTP Api request
@@ -57,7 +58,7 @@ def get_list_data(username="shamsow", userID=543014):
         response = requests.post(url, json={'query': query, 'variables': variables}).json()
         data["data"]["Page"]["mediaList"] += response["data"]["Page"]["mediaList"]
     
-    print("Completed Shows in AniList:", len(data["data"]["Page"]["mediaList"]))
+    print("AniList -> Completed:", data["data"]["Page"]["pageInfo"]["total"])
 
     return data
 
@@ -65,7 +66,7 @@ def create_anilist_file(output='anilist.json'):
     """
     Store the users anime list in a JSON file
     """
-    data = get_list_data()
+    data = get_list_data(status="COMPLETED")
 
     with open(output, 'w') as f:
         json.dump(data, f)
