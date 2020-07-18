@@ -181,6 +181,15 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
         print("Created a new MyAnimeList file at:", output)
         return
 
+
+def get_mal_data(filename='mal.json'):
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            data = json.load(f)
+        return data
+    return "List JSON file not found"
+
+
 def main():
     create_mal_file()
     
