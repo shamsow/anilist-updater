@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import time
 # Here we define our query as a multi-line string
 
 def get_list_data(username="shamsow", userID=543014, status=""):
@@ -68,7 +69,7 @@ def create_anilist_file(output='anilist.json'):
     Store the users anime list in a JSON file
     """
     data = get_list_data(status="COMPLETED")
-
+    data["data"]["date"] = time.strftime("%Y-%m-%d")
     with open(output, 'w') as f:
         json.dump(data, f)
     print("Created a new anilist file at:", output)

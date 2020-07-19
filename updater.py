@@ -58,7 +58,7 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
 
     cprint(f"Missing shows: {len(missing_ids)}", "yellow")
     # print(missing_ids)
-    for id, score, status in missing_ids:
+    for id, _, _ in missing_ids:
         cprint(mal["list_data"][0][str(id)], "yellow")
     
     return missing_ids
