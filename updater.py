@@ -98,20 +98,25 @@ def add_anime(id, score, status):
 
 
 
-def update_anilist():
-    create_mal_file()
-    create_anilist_file()
+def update_anilist(from_cli=True, refresh=False):
+    if refresh:
+        create_mal_file()
+        create_anilist_file()
     missing = find_missing()
     if len(missing) > 0:
-        command = input("Do you want to update your anilist? (y/n): ")
-        if command == "y":
+        if from_cli:
+            command = input("Do you want to update your anilist? (y/n): ")
+            if command == "y":
+                print("Updating...")
+                for id, score, status in missing:
+                    add_anime(id, score, status)
+        else:
             print("Updating...")
             for id, score, status in missing:
                 add_anime(id, score, status)
     else:
-        print("AniList is up to date with MyAnimeList")
-        
+        print("AniList is up to date with MyAnimeList")        
 
 
 if __name__ == "__main__":
-    update_anilist()
+    update_anilist(refresh=True)
