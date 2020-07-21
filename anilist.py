@@ -1,5 +1,7 @@
 import requests
 import json
+import os
+import time
 # Here we define our query as a multi-line string
 
 def get_list_data(username="shamsow", userID=543014, status=""):
@@ -53,7 +55,7 @@ def get_list_data(username="shamsow", userID=543014, status=""):
     last_page = data["data"]["Page"]["pageInfo"]["lastPage"]
 
 
-    for i in range(last_page):
+    for _ in range(last_page):
         variables["page"] += 1
         response = requests.post(url, json={'query': query, 'variables': variables}).json()
         data["data"]["Page"]["mediaList"] += response["data"]["Page"]["mediaList"]
@@ -67,11 +69,20 @@ def create_anilist_file(output='anilist.json'):
     Store the users anime list in a JSON file
     """
     data = get_list_data(status="COMPLETED")
-
+    data["data"]["date"] = time.strftime("%Y-%m-%d")
     with open(output, 'w') as f:
         json.dump(data, f)
     print("Created a new anilist file at:", output)
     return
+
+
+def get_anilist_data(filename='anilist.json'):
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            data = json.load(f)
+        return data
+    return "List JSON file not found"
+
 
 def main():
     create_anilist_file()

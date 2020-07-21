@@ -58,13 +58,13 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
 
     cprint(f"Missing shows: {len(missing_ids)}", "yellow")
     # print(missing_ids)
-    for id, score, status in missing_ids:
+    for id, _, _ in missing_ids:
         cprint(mal["list_data"][0][str(id)], "yellow")
     
     return missing_ids
 
 
-def update_anilist(id, score, status):
+def add_anime(id, score, status):
     print(f"Adding ID:{id} with a score of {score}")
     query = """
         mutation ($mediaId: Int, $status: MediaListStatus, $score: Float) {
@@ -97,20 +97,26 @@ def update_anilist(id, score, status):
     cprint(f"Added: {entry_id}", "cyan")
 
 
-def main():
-    create_mal_file()
-    create_anilist_file()
+
+def update_anilist(from_cli=True, refresh=False):
+    if refresh:
+        create_mal_file()
+        create_anilist_file()
     missing = find_missing()
     if len(missing) > 0:
-        command = input("Do you want to update your anilist? (y/n): ")
-        if command == "y":
+        if from_cli:
+            command = input("Do you want to update your anilist? (y/n): ")
+            if command == "y":
+                print("Updating...")
+                for id, score, status in missing:
+                    add_anime(id, score, status)
+        else:
             print("Updating...")
             for id, score, status in missing:
-                update_anilist(id, score, status)
+                add_anime(id, score, status)
     else:
-        print("AniList is up to date with MyAnimeList")
-        
+        print("AniList is up to date with MyAnimeList")        
 
 
 if __name__ == "__main__":
-    main()
+    update_anilist(refresh=True)
