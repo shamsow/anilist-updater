@@ -18,7 +18,12 @@ MAIN = '#99e6ff'
 BUTTON = '#99b3ff'
 BUTTON_ACTIVE = '#809fff'
 
+
 def update_frame(frame, content):
+    """
+    Add lines of text to a text frame.
+    Supports adding a single string or a list of strings.
+    """
     if isinstance(content, list):
         content = enumerate(content)
         for i, line in content:
@@ -26,11 +31,9 @@ def update_frame(frame, content):
     else:
         frame.insert("insert", f"{content}\n")
 
+
 root = tk.Tk()
 root.title("AniList Updater")
-
-
-
 
 canvas = tk.Canvas(root, height=HEIGHT, width=WIDTH, bg=MAIN)
 canvas.pack()
@@ -41,7 +44,6 @@ label1 = tk.Label(root, bg=THEME, font=('System', 18), text="MyAnimeList")
 label1.place(relwidth=0.45, relheight=0.05, relx=0.02, rely=0.04)
 button1 = tk.Button(label1, text="Refresh", bg=BUTTON, bd=0, font=("Roman", 12), activebackground=BUTTON_ACTIVE, command=lambda: update_mal_frame(refresh=True))
 button1.place(relx = 0.89, rely=0.1, relwidth=0.1, relheight=0.8)
-
 
 frame2 = tk.Text(root, bg=THEME, bd=0, font=('Arial', 18), spacing1=5, padx=5, highlightthickness=0)
 frame2.place(relx=0.53, rely=0.1, relwidth=0.45, relheight=0.3)
@@ -59,6 +61,9 @@ button3.place(relx = 0.2, rely=0.92, relwidth=0.6, relheight=0.05)
 
 
 def update_missing_frame():
+    """
+    Update the status of the frame that contains the list of missing anime
+    """
     frame3.delete(1.0, "end")
     missing = find_missing()
     if len(missing) > 0:
@@ -70,12 +75,17 @@ def update_missing_frame():
 
 
 def update_anime():
-    
+    """
+    Call the anilist update and the missing frame update functions
+    """
     update_anilist(from_cli=False)
     update_missing_frame()
     
 
 def update_mal_frame(refresh=False):
+    """
+    Update the status of the frame that contains the MAL data
+    """
     frame1.delete(1.0, "end")
     update_frame(frame1, "Refreshing...")
     if refresh:
@@ -92,6 +102,9 @@ def update_mal_frame(refresh=False):
 
 
 def update_anilist_frame(refresh=False):
+    """
+    Update the status of the frame that contains the AniList data
+    """
     frame2.delete(1.0, "end")
     update_frame(frame2, "Refreshing...")
     if refresh:
@@ -112,6 +125,7 @@ def update_anilist_frame(refresh=False):
     update_frame(frame2, anilist_titles)
     
 
+# Update the frames at the start of the loop
 update_mal_frame()
 update_anilist_frame()
 update_missing_frame()

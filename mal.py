@@ -123,7 +123,7 @@ def rename_list(new_name='animelist.xml'):
         print(xml_file)
         for name in xml_file:
             # Remove the old animelist file
-            if name[len(DATA_FOLDER) + 1:] == 'animelist.xml':
+            if name[len(DATA_FOLDER) + 1:] == 'animelist.xml': # Use string indexing to compare the filenames only
                 os.remove(name)
         xml_file = glob(os.path.join(DATA_FOLDER, '*.xml'))
         print(xml_file)
