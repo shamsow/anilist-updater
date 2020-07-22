@@ -12,12 +12,14 @@ from glob import glob
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DOWNLOAD_DIR = os.path.join("/mnt", "c", "Users", "Sadat", "Downloads/")
-PROJECT_DIR = os.path.join(BASE_DIR, "src/")
+DOWNLOAD_DIR = os.path.join("/mnt", "c", "Users", "Sadat", "Downloads" + os.sep)
+PROJECT_DIR = os.path.join(BASE_DIR, "src" + os.sep)
+DATA_FOLDER = 'data'
+DATA_DIR = os.path.join(BASE_DIR, 'src', 'data' + os.sep)
 AUTH_FILE = 'auth.json'
 DRIVER_PATH = os.path.join(BASE_DIR, ".anilist-venv", "bin", "chromedriver.exe")
 
-def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
+def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR):
     """
     Use Selenium with a Chrome driver to get the MyAnimeList xml file and move it to the project folder
     """
@@ -27,8 +29,8 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
         print("No internet. Can't fetch new list.")
         return
     # Check if list has already been fetched today
-    if os.path.exists('mal.json'):
-        with open('mal.json', 'r') as f:
+    if os.path.exists(DATA_DIR + 'mal.json'):
+        with open(DATA_DIR + 'mal.json', 'r') as f:
             data = json.load(f)
         if data["date"] == time.strftime("%Y-%m-%d"):
             print("List already fetched today, proceed with present list file.")
@@ -78,7 +80,7 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=PROJECT_DIR):
     if len(filename) == 0:
         return
     elif len(filename) > 1:
-        print("More than one animelist .gz files in donwloads folder. Delete all except the latest one.")
+        print("More than one animelist .gz files in donwloads folder. Delete all except the latest one. Files found:", filename)
         return
     print(desired_location + filename[0][29:])
     with open(filename[0], 'rb') as f_in:
@@ -95,9 +97,12 @@ def unzip_list():
     Unzip the animelist .gz file in the project directory and remove the zip file
     """
     print("Unzipping list file")
-    filename = glob('*.gz')
-    if len(filename) != 1:
-        print("More than one .gz file in the project folder. Delete all except the latest one.")
+    filename = glob(os.path.join(DATA_FOLDER, '*.gz'))
+    if len(filename) == 0:
+        print("No .gz animelist files found. Extraction not needed.")
+        return
+    if len(filename) > 1:
+        print("More than one .gz file in the project folder. Delete all except the latest one. Files found:", filename)
         return
     
     with gzip.open(filename[0], 'rb') as f_in:
@@ -113,17 +118,17 @@ def rename_list(new_name='animelist.xml'):
     unzip_list()
 
     print("Renaming new list and removing old one")
-    xml_file = glob('*.xml')
+    xml_file = glob(os.path.join(DATA_FOLDER, '*.xml'))
     if len(xml_file) > 1:
         print(xml_file)
         for name in xml_file:
             # Remove the old animelist file
-            if name == 'animelist.xml':
+            if name[len(DATA_FOLDER) + 1:] == 'animelist.xml': # Use string indexing to compare the filenames only
                 os.remove(name)
-        xml_file = glob('*.xml')
+        xml_file = glob(os.path.join(DATA_FOLDER, '*.xml'))
         print(xml_file)
     # Rename the latest animelist file
-    os.rename(xml_file[0], new_name)
+    os.rename(xml_file[0], os.path.join(DATA_FOLDER, new_name))
 
 def extract_data_from_list(filename, completed_only=True):
     """
@@ -132,12 +137,12 @@ def extract_data_from_list(filename, completed_only=True):
     rename_list()
 
     print("Extracting data from list xml file")
-    if not os.path.exists(filename):
+    if not os.path.exists(os.path.join(DATA_FOLDER, filename)):
         print("Could not find the list file. Make sure the file has been added and properly named.")
         return
 
     # Get the needed user info fields from the xml file
-    tree = ET.parse(filename)
+    tree = ET.parse(os.path.join(DATA_FOLDER, filename))
     root = tree.getroot()
     info = root[0]
     username = info.find('user_name').text
@@ -171,20 +176,20 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
     """
     Store the relevant anime data from the xml file in a JSON file
     """
-    res = fetch_list()
+    fetch_list()
     # if res is not None:
         # Proceed to creating a file if the old one is invalid or it doesn't exist
     data = extract_data_from_list(filename)
     if data is not None:
-        with open(output, 'w') as f:
+        with open(os.path.join(DATA_FOLDER, output), 'w') as f:
             json.dump(data, f)
         print("Created a new MyAnimeList file at:", output)
         return
 
 
 def get_mal_data(filename='mal.json'):
-    if os.path.exists(filename):
-        with open(filename, 'r') as f:
+    if os.path.exists(os.path.join(DATA_FOLDER, filename)):
+        with open(os.path.join(DATA_FOLDER, filename), 'r') as f:
             data = json.load(f)
         return data
     return "List JSON file not found"

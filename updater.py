@@ -1,14 +1,15 @@
 import json
 import requests
-
+import os
 from termcolor import cprint
 
 from mal import create_mal_file
 from anilist import create_anilist_file
 
 AUTH_FILE = 'auth.json'
-ANILIST_FILE = 'anilist.json'
-MAL_FILE = 'mal.json'
+DATA_FOLDER = 'data'
+ANILIST_FILE = os.path.join(DATA_FOLDER, 'anilist.json')
+MAL_FILE = os.path.join(DATA_FOLDER, 'mal.json')
 
 statuses = {"Completed": "COMPLETED", "Watching": "CURRENT", "Plan to Watch": "PLANNING", "On-Hold": "PAUSED", "Dropped": "DROPPED"}
 
