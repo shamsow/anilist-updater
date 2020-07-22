@@ -64,21 +64,21 @@ def get_list_data(username="shamsow", userID=543014, status=""):
 
     return data
 
-def create_anilist_file(output='anilist.json'):
+def create_anilist_file(output='anilist.json', directory='data'):
     """
     Store the users anime list in a JSON file
     """
     data = get_list_data(status="COMPLETED")
     data["data"]["date"] = time.strftime("%Y-%m-%d")
-    with open(output, 'w') as f:
+    with open(os.path.join(directory, output), 'w') as f:
         json.dump(data, f)
     print("Created a new anilist file at:", output)
     return
 
 
-def get_anilist_data(filename='anilist.json'):
+def get_anilist_data(filename='anilist.json', directory='data'):
     if os.path.exists(filename):
-        with open(filename, 'r') as f:
+        with open(os.path.join(directory, filename), 'r') as f:
             data = json.load(f)
         return data
     return "List JSON file not found"

@@ -4,12 +4,14 @@ import datetime
 import os
 import requests
 
+# python3 -m unittest -v tests
+
 class TestAccessToken(unittest.TestCase):
     def test_expiration(self):
         """
         Test that Access Token is still valid
         """
-        # python3 -m unittest -v tests
+        
         filename = 'auth.json'
         with open(filename, 'r') as f:
             data = json.load(f)
