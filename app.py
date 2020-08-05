@@ -78,8 +78,10 @@ def update_anime():
     """
     Call the anilist update and the missing frame update functions
     """
+    update_frame(frame3, "Updating...")
     update_anilist(from_cli=False)
-    update_missing_frame()
+    frame3.delete(1.0, "end")
+    update_frame(frame3, "Update complete!")
     
 
 def update_mal_frame(refresh=False):

@@ -77,7 +77,7 @@ def create_anilist_file(output='anilist.json', directory='data'):
 
 
 def get_anilist_data(filename='anilist.json', directory='data'):
-    if os.path.exists(filename):
+    if os.path.exists(os.path.join(directory, filename)):
         with open(os.path.join(directory, filename), 'r') as f:
             data = json.load(f)
         return data

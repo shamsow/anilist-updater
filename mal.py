@@ -56,9 +56,12 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR):
     driver.get("https://myanimelist.net/login.php")
     driver.find_element_by_id("loginUserName").send_keys(creds["MAL_USERNAME"])
     driver.find_element_by_id("login-password").send_keys(creds["MAL_PASSWORD"])
-    driver.find_element_by_name("sublogin").click()
+    # driver.find_element_by_name("Login").click()
+    driver.find_element_by_css_selector('input.inputButton.btn-form-submit.btn-recaptcha-submit').click()
     # Navigate to list export page accept the alert
+    time.sleep(1)
     driver.get("https://myanimelist.net/panel.php?go=export")
+    time.sleep(1)
     elem = driver.find_element_by_name("subexport")
     elem.click()
     alert = driver.switch_to.alert
