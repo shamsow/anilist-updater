@@ -8,6 +8,7 @@ from mal import create_mal_file, get_mal_data
 from anilist import create_anilist_file, get_anilist_data
 from updater import update_anilist, find_missing
 
+## Run the "Xming" program first before running this file
 
 HEIGHT = 800
 WIDTH = 1500
