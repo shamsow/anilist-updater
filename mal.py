@@ -6,6 +6,7 @@ import json
 import time
 import shutil
 import gzip
+import fire
 import requests
 import xml.etree.ElementTree as ET
 from glob import glob
@@ -19,7 +20,7 @@ DATA_DIR = os.path.join(BASE_DIR, 'src', 'data' + os.sep)
 AUTH_FILE = 'auth.json'
 DRIVER_PATH = os.path.join(BASE_DIR, ".anilist-venv", "bin", "chromedriver.exe")
 
-def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR):
+def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_date=True):
     """
     Use Selenium with a Chrome driver to get the MyAnimeList xml file and move it to the project folder
     """
@@ -28,14 +29,16 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR):
     if req.status_code != 200:
         print("No internet. Can't fetch new list.")
         return
-    # Check if list has already been fetched today
-    if os.path.exists(DATA_DIR + 'mal.json'):
-        with open(DATA_DIR + 'mal.json', 'r') as f:
-            data = json.load(f)
-        if data["date"] == time.strftime("%Y-%m-%d"):
-            print("List already fetched today, proceed with present list file.")
-            return
-        print("List outdated")
+    
+    if check_date:
+        # Check if list has already been fetched today
+        if os.path.exists(DATA_DIR + 'mal.json'):
+            with open(DATA_DIR + 'mal.json', 'r') as f:
+                data = json.load(f)
+            if data["date"] == time.strftime("%Y-%m-%d"):
+                print("List already fetched today, proceed with present list file.")
+                return
+            print("List outdated")
     print("Fetching list from MyAnimeList")
     # chrome_options = webdriver.ChromeOptions()
     # prefs = {
@@ -69,6 +72,7 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR):
     # Get the current page after being redirected
     new_url = driver.window_handles[0]
     driver.switch_to.window(new_url)
+    time.sleep(0.5)
     # Click the list export link and download
     list_link = driver.find_element_by_partial_link_text("animelist_")
     list_link.click()
@@ -116,7 +120,7 @@ def unzip_list():
 
 def rename_list(new_name='animelist.xml'):
     """
-    Rename the animelist xml file to preset value
+    Rename the animelist xml file in project folder to preset value
     """
     unzip_list()
 
@@ -191,6 +195,9 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
 
 
 def get_mal_data(filename='mal.json'):
+    """
+    Returns the MAL data saved in a JSON file if it exists
+    """
     if os.path.exists(os.path.join(DATA_FOLDER, filename)):
         with open(os.path.join(DATA_FOLDER, filename), 'r') as f:
             data = json.load(f)
@@ -199,7 +206,15 @@ def get_mal_data(filename='mal.json'):
 
 
 def main():
-    create_mal_file()
+    # create_mal_file()
+    print("Usage: python3 mal.py [command]")
+    print("Commands reference: python3 mal.py -- --help")
+    fire.Fire({
+        'create': create_mal_file,
+        'fetch': fetch_list,
+        'rename': rename_list,
+        'unzip': unzip_list,
+    })
     
 
 if __name__ == '__main__':
