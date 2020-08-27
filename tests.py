@@ -1,9 +1,9 @@
 import unittest
-import json
 import datetime
 import os
 import requests
 
+from config import config_data
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 # python3 -m unittest -v tests
@@ -13,11 +13,7 @@ class TestAccessToken(unittest.TestCase):
         """
         Test that Access Token is still valid
         """
-        
-        filename = 'auth.json'
-        with open(filename, 'r') as f:
-            data = json.load(f)
-        expiration_date = datetime.datetime.strptime(data["EXPIRES"], "%Y-%m-%d")
+        expiration_date = datetime.datetime.strptime(config_data.get("Anilist", "EXPIRES"), "%Y-%m-%d")
         today_date = datetime.datetime.today()
         remaining = (expiration_date - today_date).days
         self.assertTrue(remaining > 0)

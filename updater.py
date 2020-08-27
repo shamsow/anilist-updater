@@ -1,12 +1,12 @@
 import json
 import requests
 import os
-from termcolor import cprint
 
+from termcolor import cprint
 from mal import create_mal_file
 from anilist import create_anilist_file
+from config import config_data
 
-AUTH_FILE = 'auth.json'
 DATA_FOLDER = 'data'
 ANILIST_FILE = os.path.join(DATA_FOLDER, 'anilist.json')
 MAL_FILE = os.path.join(DATA_FOLDER, 'mal.json')
@@ -47,9 +47,7 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
 
     # Get the id of all the anime in each list
     anilist_id = [i["media"]["idMal"] for i in  anilist["data"]["Page"]["mediaList"]]
-    # print("Completed Shows in AniList:", len(anilist_id))
     mal_id = list(map(int, mal["list_data"][0].keys()))
-    # print(mal_titles)
 
     # Find the anime that are in MAL but not in AniList
     missing_ids = []
@@ -84,12 +82,8 @@ def add_anime(id, score, status):
 
     url = 'https://graphql.anilist.co'
 
-    creds = {}
-    with open(AUTH_FILE, 'r') as f:
-        creds = json.load(f)
-
     headers = {
-        'Authorization': 'Bearer ' + creds["ACCESS_TOKEN"],
+        'Authorization': 'Bearer ' + config_data.get("Anilist", "ACCESS_TOKEN"),
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     }
@@ -116,7 +110,7 @@ def update_anilist(from_cli=True, refresh=False):
             for id, score, status in missing:
                 add_anime(id, score, status)
     else:
-        print("AniList is up to date with MyAnimeList")        
+        cprint("AniList is up to date with MyAnimeList", "cyan")     
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from config import config_data
 
 import os
 import json
@@ -17,10 +18,10 @@ DOWNLOAD_DIR = os.path.join("/mnt", "c", "Users", "Sadat", "Downloads" + os.sep)
 PROJECT_DIR = os.path.join(BASE_DIR, "src" + os.sep)
 DATA_FOLDER = 'data'
 DATA_DIR = os.path.join(BASE_DIR, 'src', 'data' + os.sep)
-AUTH_FILE = 'auth.json'
+# AUTH_FILE = 'auth.json'
 DRIVER_PATH = os.path.join(BASE_DIR, ".anilist-venv", "bin", "chromedriver.exe")
 
-def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_date=True):
+def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_date=False):
     """
     Use Selenium with a Chrome driver to get the MyAnimeList xml file and move it to the project folder
     """
@@ -51,14 +52,11 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     # driver = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
     driver = webdriver.Chrome(executable_path=chrome_path)
 
-    # Get MAL username and password
-    creds = {}
-    with open(AUTH_FILE, 'r') as f:
-        creds = json.load(f)
-    # Login to MAL
     driver.get("https://myanimelist.net/login.php")
-    driver.find_element_by_id("loginUserName").send_keys(creds["MAL_USERNAME"])
-    driver.find_element_by_id("login-password").send_keys(creds["MAL_PASSWORD"])
+    # Get MAL username and password
+    username, password = config_data.get("MAL", "username"), config_data.get("MAL", "password")
+    driver.find_element_by_id("loginUserName").send_keys(username)
+    driver.find_element_by_id("login-password").send_keys(password)
     # driver.find_element_by_name("Login").click()
     driver.find_element_by_css_selector('input.inputButton.btn-form-submit.btn-recaptcha-submit').click()
     # Navigate to list export page accept the alert
@@ -77,7 +75,7 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     list_link = driver.find_element_by_partial_link_text("animelist_")
     list_link.click()
     # Delay for 5 seocnds to allow the list to donwload
-    time.sleep(5)
+    time.sleep(3)
     print("Selenium tasks complete")
     driver.close()
 
@@ -183,7 +181,7 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
     """
     Store the relevant anime data from the xml file in a JSON file
     """
-    fetch_list()
+    fetch_list(check_date=True)
     # if res is not None:
         # Proceed to creating a file if the old one is invalid or it doesn't exist
     data = extract_data_from_list(filename)
