@@ -1,7 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from config import config_data
-
 import os
 import json
 import time
@@ -10,6 +6,10 @@ import gzip
 import fire
 import requests
 import xml.etree.ElementTree as ET
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from config import config_data
 from glob import glob
 
 
@@ -18,8 +18,9 @@ DOWNLOAD_DIR = os.path.join("/mnt", "c", "Users", "Sadat", "Downloads" + os.sep)
 PROJECT_DIR = os.path.join(BASE_DIR, "src" + os.sep)
 DATA_FOLDER = 'data'
 DATA_DIR = os.path.join(BASE_DIR, 'src', 'data' + os.sep)
-# AUTH_FILE = 'auth.json'
 DRIVER_PATH = os.path.join(BASE_DIR, ".anilist-venv", "bin", "chromedriver.exe")
+MAL_FILE = config_data.get("System", "mal_file")
+MAL_XML_FILE = config_data.get("System", "mal_xml_file")
 
 def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_date=False):
     """
@@ -33,8 +34,8 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     
     if check_date:
         # Check if list has already been fetched today
-        if os.path.exists(DATA_DIR + 'mal.json'):
-            with open(DATA_DIR + 'mal.json', 'r') as f:
+        if os.path.exists(DATA_DIR + MAL_FILE):
+            with open(DATA_DIR + MAL_FILE, 'r') as f:
                 data = json.load(f)
             if data["date"] == time.strftime("%Y-%m-%d"):
                 print("List already fetched today, proceed with present list file.")
@@ -116,7 +117,7 @@ def unzip_list():
     os.remove(filename[0])
 
 
-def rename_list(new_name='animelist.xml'):
+def rename_list(new_name=MAL_XML_FILE):
     """
     Rename the animelist xml file in project folder to preset value
     """
@@ -128,7 +129,7 @@ def rename_list(new_name='animelist.xml'):
         print(xml_file)
         for name in xml_file:
             # Remove the old animelist file
-            if name[len(DATA_FOLDER) + 1:] == 'animelist.xml': # Use string indexing to compare the filenames only
+            if name[len(DATA_FOLDER) + 1:] == MAL_XML_FILE: # Use string indexing to compare the filenames only
                 os.remove(name)
         xml_file = glob(os.path.join(DATA_FOLDER, '*.xml'))
         print(xml_file)
@@ -177,7 +178,7 @@ def extract_data_from_list(filename, completed_only=True):
     return data
 
 
-def create_mal_file(filename='animelist.xml', output='mal.json'):
+def create_mal_file(filename=MAL_XML_FILE, output=MAL_FILE):
     """
     Store the relevant anime data from the xml file in a JSON file
     """
@@ -192,7 +193,7 @@ def create_mal_file(filename='animelist.xml', output='mal.json'):
         return
 
 
-def get_mal_data(filename='mal.json'):
+def get_mal_data(filename=MAL_FILE):
     """
     Returns the MAL data saved in a JSON file if it exists
     """

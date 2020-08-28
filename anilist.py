@@ -2,9 +2,15 @@ import requests
 import json
 import os
 import time
-# Here we define our query as a multi-line string
 
-def get_list_data(username="shamsow", userID=543014, status=""):
+from config import config_data
+
+ANILIST_FILE = config_data.get("System", "anilist_file")
+USERNAME = config_data.get("Anilist", "username")
+USER_ID = int(config_data.get("Anilist", "user_id"))
+
+# Here we define our query as a multi-line string
+def get_list_data(username=USERNAME, userID=USER_ID, status=""):
     """
     Query the AniList API for the users anime list
     """
@@ -64,7 +70,7 @@ def get_list_data(username="shamsow", userID=543014, status=""):
 
     return data
 
-def create_anilist_file(output='anilist.json', directory='data'):
+def create_anilist_file(output=ANILIST_FILE, directory='data'):
     """
     Store the users anime list in a JSON file
     """
@@ -76,7 +82,7 @@ def create_anilist_file(output='anilist.json', directory='data'):
     return
 
 
-def get_anilist_data(filename='anilist.json', directory='data'):
+def get_anilist_data(filename=ANILIST_FILE, directory='data'):
     if os.path.exists(os.path.join(directory, filename)):
         with open(os.path.join(directory, filename), 'r') as f:
             data = json.load(f)

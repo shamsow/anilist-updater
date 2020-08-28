@@ -8,8 +8,8 @@ from anilist import create_anilist_file
 from config import config_data
 
 DATA_FOLDER = 'data'
-ANILIST_FILE = os.path.join(DATA_FOLDER, 'anilist.json')
-MAL_FILE = os.path.join(DATA_FOLDER, 'mal.json')
+ANILIST_FILE = os.path.join(DATA_FOLDER, config_data.get("System", "anilist_file"))
+MAL_FILE = os.path.join(DATA_FOLDER, config_data.get("System", "mal_file"))
 
 statuses = {"Completed": "COMPLETED", "Watching": "CURRENT", "Plan to Watch": "PLANNING", "On-Hold": "PAUSED", "Dropped": "DROPPED"}
 
