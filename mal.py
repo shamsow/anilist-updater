@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import SessionNotCreatedException
 from config import config_data
 from glob import glob
 
@@ -51,7 +52,11 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     # chrome_options.add_experimental_option("prefs", prefs)
     chrome_path = DRIVER_PATH
     # driver = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
-    driver = webdriver.Chrome(executable_path=chrome_path)
+    try:
+        driver = webdriver.Chrome(executable_path=chrome_path)
+    except SessionNotCreatedException:
+        print("The driver failed. It is likely the system version of chrome has been updated and this driver is no longer compatible.")
+        print("Download the latest stable driver from https://chromedriver.chromium.org/ and put it in the bin folder in the virtual environment")
 
     driver.get("https://myanimelist.net/login.php")
     # Get MAL username and password
