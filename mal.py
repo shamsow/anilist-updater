@@ -7,6 +7,7 @@ import fire
 import requests
 import xml.etree.ElementTree as ET
 
+from exceptions import DriverOutdatedError
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import SessionNotCreatedException
@@ -57,6 +58,7 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     except SessionNotCreatedException:
         print("The driver failed. It is likely the system version of chrome has been updated and this driver is no longer compatible.")
         print("Download the latest stable driver from https://chromedriver.chromium.org/ and put it in the bin folder in the virtual environment")
+        raise DriverOutdatedError
 
     driver.get("https://myanimelist.net/login.php")
     # Get MAL username and password
