@@ -19,7 +19,7 @@ from glob import glob
 
 colorama.init()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DOWNLOAD_DIR = os.path.join("C:", "Users", "Sadat", "Downloads")
+DOWNLOAD_DIR = os.path.join("C:", "Users", config_data.get("System", "user"), "Downloads")
 PROJECT_DIR = os.path.join(BASE_DIR, "src" + os.sep)
 DATA_FOLDER = 'data'
 DATA_DIR = os.path.join(BASE_DIR, 'src', 'data' + os.sep)
