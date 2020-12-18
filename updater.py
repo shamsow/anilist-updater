@@ -1,12 +1,15 @@
 import json
-import requests
 import os
+import colorama
+import requests
+
 
 from termcolor import cprint
 from mal import create_mal_file
 from anilist import create_anilist_file
 from config import config_data
 
+colorama.init()
 DATA_FOLDER = 'data'
 ANILIST_FILE = os.path.join(DATA_FOLDER, config_data.get("System", "anilist_file"))
 MAL_FILE = os.path.join(DATA_FOLDER, config_data.get("System", "mal_file"))

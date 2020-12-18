@@ -4,23 +4,26 @@ import time
 import shutil
 import gzip
 import fire
+import colorama
 import requests
+import webbrowser
 import xml.etree.ElementTree as ET
 
-from exceptions import DriverOutdatedError
+# from exceptions import DriverOutdatedError
+from termcolor import cprint
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import SessionNotCreatedException
 from config import config_data
 from glob import glob
 
-
+colorama.init()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DOWNLOAD_DIR = os.path.join("/mnt", "c", "Users", "Sadat", "Downloads" + os.sep)
+DOWNLOAD_DIR = os.path.join("C:", "Users", "Sadat", "Downloads")
 PROJECT_DIR = os.path.join(BASE_DIR, "src" + os.sep)
 DATA_FOLDER = 'data'
 DATA_DIR = os.path.join(BASE_DIR, 'src', 'data' + os.sep)
-DRIVER_PATH = os.path.join(BASE_DIR, ".anilist-venv", "bin", "chromedriver.exe")
+DRIVER_PATH = os.path.join(BASE_DIR, "anilist-venv", "Scripts", "chromedriver.exe")
 MAL_FILE = config_data.get("System", "mal_file")
 MAL_XML_FILE = config_data.get("System", "mal_xml_file")
 
@@ -51,14 +54,15 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     #     "download.directory_upgrade": True
     # }
     # chrome_options.add_experimental_option("prefs", prefs)
-    chrome_path = DRIVER_PATH
+    # chrome_path = DRIVER_PATH
     # driver = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
     try:
-        driver = webdriver.Chrome(executable_path=chrome_path)
+        driver = webdriver.Chrome(executable_path=DRIVER_PATH)
     except SessionNotCreatedException:
-        print("The driver failed. It is likely the system version of chrome has been updated and this driver is no longer compatible.")
-        print("Download the latest stable driver from https://chromedriver.chromium.org/ and put it in the bin folder in the virtual environment")
-        raise DriverOutdatedError
+        cprint("The driver failed. It is likely the system version of chrome has been updated and this driver is no longer compatible.", "yellow")
+        cprint("Download the latest stable driver from https://chromedriver.chromium.org/ and put it in the bin folder in the virtual environment", "yellow")
+        webbrowser.open("https://chromedriver.chromium.org/")
+        # raise DriverOutdatedError
 
     driver.get("https://myanimelist.net/login.php")
     # Get MAL username and password
