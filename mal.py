@@ -16,6 +16,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import SessionNotCreatedException
 from config import config_data
 from glob import glob
+from obscure import decode
 
 colorama.init()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -66,7 +67,8 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
 
     driver.get("https://myanimelist.net/login.php")
     # Get MAL username and password
-    username, password = config_data.get("MAL", "username"), config_data.get("MAL", "password")
+    username, password = config_data.get("MAL", "username"), decode(config_data.get("MAL", "password"), int(config_data.get("MAL", "cypher_key")))
+    print(username, password)
     driver.find_element_by_id("loginUserName").send_keys(username)
     driver.find_element_by_id("login-password").send_keys(password)
     # driver.find_element_by_name("Login").click()

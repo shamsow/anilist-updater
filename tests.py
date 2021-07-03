@@ -5,8 +5,9 @@ import requests
 
 from config import config_data
 from selenium import webdriver
+from mal import DRIVER_PATH
 from selenium.common.exceptions import NoSuchElementException
-# python3 -m unittest -v tests
+# python -m unittest -v tests
 
 class TestAccessToken(unittest.TestCase):
     def test_expiration(self):
@@ -30,7 +31,8 @@ class TestInternet(unittest.TestCase):
 
 class TestSelenium(unittest.TestCase):
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    chrome_path = os.path.join(BASE_DIR, ".anilist-venv", "bin", "chromedriver.exe")
+    # chrome_path = os.path.join(BASE_DIR, DRIVER_PATH)
+    chrome_path = DRIVER_PATH
 
     def setUp(self):
         """
