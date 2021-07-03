@@ -23,8 +23,8 @@ def load_data(filename):
 
 def get_mediaId(idMal):
     query = """
-        query ($id: Int) {
-            Media (idMal: $id) {
+        query ($id: Int, $type: MediaType) {
+            Media (idMal: $id, type: $type) {
                 id
                 title {
                     english
@@ -35,12 +35,13 @@ def get_mediaId(idMal):
     """
     # Define our query variables and values that will be used in the query request
     variables = {
-        "id": idMal
+        "id": idMal,
+        "type": "ANIME"
     }
 
     url = 'https://graphql.anilist.co'
     response = requests.post(url, json={'query': query, 'variables': variables}).json()
-    return response["data"]["Media"]["id"]
+    return (response["data"]["Media"]["id"], response["data"]["Media"]["title"]["english"])
 
 def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
 
@@ -67,7 +68,8 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
 
 
 def add_anime(id, score, status):
-    print(f"Adding ID:{id} with a score of {score}")
+    mediaID, title = get_mediaId(id)
+    print(f"Adding ID:{mediaID} [{title}] with a score of {score}")
     query = """
         mutation ($mediaId: Int, $status: MediaListStatus, $score: Float) {
         SaveMediaListEntry (mediaId: $mediaId, status: $status, score: $score) {
@@ -78,7 +80,7 @@ def add_anime(id, score, status):
     """
     # Define our query variables and values that will be used in the query request
     variables = {
-        "mediaId": get_mediaId(id),
+        "mediaId": mediaID,
         "status": statuses[status],
         "score": score
     }
