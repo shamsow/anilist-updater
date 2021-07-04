@@ -50,13 +50,17 @@ def find_missing(anilist_file=ANILIST_FILE, mal_file=MAL_FILE):
     print("MyAnimeList file created on", mal["date"])
 
     # Get the id of all the anime in each list
-    anilist_id = [i["media"]["idMal"] for i in  anilist["data"]["Page"]["mediaList"]]
+    anilist_ids = {}
+    for i in anilist["data"]["Page"]["mediaList"]:
+        anilist_ids[i["media"]["idMal"]] = 1
+
     mal_id = list(map(int, mal["list_data"][0].keys()))
 
     # Find the anime that are in MAL but not in AniList
     missing_ids = []
     for id in mal_id:
-        if id not in anilist_id:
+        found = anilist_ids.get(id, None)
+        if found is None:
             missing_ids.append((id, mal["list_data"][0][str(id)]["score"], mal["list_data"][0][str(id)]["status"]))
 
     cprint(f"Missing shows: {len(missing_ids)}", "yellow")
@@ -93,8 +97,8 @@ def add_anime(id, score, status):
         'Accept': 'application/json',
     }
     response = requests.post(url, json={'query': query, 'variables': variables}, headers=headers).json()
-    entry_id = response["data"]["SaveMediaListEntry"]["id"]
-    cprint(f"Added: {entry_id}", "cyan")
+    # entry_id = response["data"]["SaveMediaListEntry"]["id"]
+    cprint(f"Succesfully Added: ID:{mediaID}", "cyan")
 
 
 

@@ -68,7 +68,6 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     driver.get("https://myanimelist.net/login.php")
     # Get MAL username and password
     username, password = config_data.get("MAL", "username"), decode(config_data.get("MAL", "password"), int(config_data.get("MAL", "cypher_key")))
-    print(username, password)
     driver.find_element_by_id("loginUserName").send_keys(username)
     driver.find_element_by_id("login-password").send_keys(password)
     # driver.find_element_by_name("Login").click()
@@ -96,14 +95,16 @@ def fetch_list(download_location=DOWNLOAD_DIR, desired_location=DATA_DIR, check_
     print("Copying file")
     # Get the downloaded file from the downloads folder and move it to project folder
     filename = glob(download_location + '*.gz')
+    
     if len(filename) == 0:
         return
     elif len(filename) > 1:
         print("More than one animelist .gz files in donwloads folder. Delete all except the latest one. Files found:", filename)
         return
+
     print(desired_location + filename[0][29:])
+
     with open(filename[0], 'rb') as f_in:
-        
         with open(desired_location + filename[0][29:], 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
     os.remove(filename[0])
